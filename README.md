@@ -27,6 +27,11 @@ The main commands to know are
 - `m <Spd1> <Spd2>` - Set the closed-loop speed of each motor in *counts per loop* (Default loop rate is 30, so `(counts per sec)/30`
 - `p <Kp> <Kd> <Ki> <Ko>` - Update the PID parameters
 
+And for the servo:
+
+- `s <S1> <S2>`- Set the servo values
+- `t` - Servos response with current values
+
 
 ## Gotchas
 

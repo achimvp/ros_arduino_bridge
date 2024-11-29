@@ -66,11 +66,15 @@
    #define L298_MOTOR_DRIVER
 #endif
 
-//#define USE_SERVOS  // Enable use of PWM servos as defined in servos.h
-#undef USE_SERVOS     // Disable use of PWM servos
+
+#define USE_SERVOS  // Enable use of PWM servos as defined in servos.h
+// #undef USE_SERVOS     // Disable use of PWM servos
+
+#define USE_IMU  // Enable use of MPU-6050 IMU
+// #undef USE_IMU  // Disable use of IMU
 
 /* Serial port baud rate */
-#define BAUDRATE     57600
+#define BAUDRATE     115200
 
 /* Maximum PWM signal */
 #define MAX_PWM        255
@@ -91,6 +95,14 @@
 #ifdef USE_SERVOS
    #include <Servo.h>
    #include "servos.h"
+#endif
+
+#ifdef USE_IMU
+  #include <Adafruit_MPU6050.h>
+  #include <Adafruit_Sensor.h>
+  #include "imu.h"
+  
+  sensors_event_t a, g, temp;
 #endif
 
 #ifdef USE_BASE
@@ -194,6 +206,24 @@ int runCommand() {
     Serial.println(servos[arg1].getServo().read());
     break;
 #endif
+#ifdef USE_IMU
+  case IMU_READ:
+    imu.getEvent(&a, &g, &temp);
+    Serial.print(a.acceleration.x);
+    Serial.print(" ");
+    Serial.print(a.acceleration.y);
+    Serial.print(" ");
+    Serial.print(a.acceleration.z);
+    Serial.print(" ");
+    Serial.print(g.gyro.x);
+    Serial.print(" ");
+    Serial.print(g.gyro.y);
+    Serial.print(" ");
+    Serial.print(g.gyro.z);
+    Serial.print(" ");
+    Serial.println(temp.temperature);
+    break;
+#endif
     
 #ifdef USE_BASE
   case READ_ENCODERS:
@@ -286,6 +316,14 @@ void setup() {
           servoInitPosition[i]);
     }
   #endif
+
+// Start the IMU
+#ifdef USE_IMU
+if (!imu.begin()) {
+  Serial.println("IMU init failed");
+}
+#endif
+
 }
 
 /* Enter the main loop.  Read and parse input from the serial port
