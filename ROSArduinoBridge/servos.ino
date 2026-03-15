@@ -15,9 +15,9 @@
 // Constructor
 SweepServo::SweepServo()
 {
-  this->currentPositionDegrees = 0;
-  this->targetPositionDegrees = 0;
-  this->lastSweepCommand = 0;
+  this->currentPositionDegrees = 90;
+  this->targetPositionDegrees = 90;
+  this->lastSweepCommand = millis();
 }
 
 

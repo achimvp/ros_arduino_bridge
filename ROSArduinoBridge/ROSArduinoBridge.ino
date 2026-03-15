@@ -143,8 +143,8 @@ char chr;
 char cmd;
 
 // Character arrays to hold the first and second arguments
-char argv1[16];
-char argv2[16];
+char argv1[64];
+char argv2[64];
 
 // The arguments converted to integers
 long arg1;
@@ -199,11 +199,14 @@ int runCommand() {
     break;
 #ifdef USE_SERVOS
   case SERVO_WRITE:
-    servos[arg1].setTargetPosition(arg2);
+    servos[0].setTargetPosition(arg1);
+    servos[1].setTargetPosition(arg2);
     Serial.println("OK");
     break;
   case SERVO_READ:
-    Serial.println(servos[arg1].getServo().read());
+    Serial.print(servos[0].getServo().read());
+    Serial.print(" ");
+    Serial.println(servos[1].getServo().read());
     break;
 #endif
 #ifdef USE_IMU
@@ -297,31 +300,33 @@ void setup() {
     // tell pin change mask to listen to left encoder pins
     PCMSK2 |= (1 << LEFT_ENC_PIN_A)|(1 << LEFT_ENC_PIN_B);
     // tell pin change mask to listen to right encoder pins
-    PCMSK1 |= (1 << RIGHT_ENC_PIN_A)|(1 << RIGHT_ENC_PIN_B);
+    PCMSK0 |= (1 << RIGHT_ENC_PIN_A)|(1 << RIGHT_ENC_PIN_B);
     
     // enable PCINT1 and PCINT2 interrupt in the general interrupt mask
-    PCICR |= (1 << PCIE1) | (1 << PCIE2);
+    PCICR |= (1 << PCIE0) | (1 << PCIE2);
   #endif
   initMotorController();
   resetPID();
 #endif
 
 /* Attach servos if used */
-  #ifdef USE_SERVOS
-    int i;
-    for (i = 0; i < N_SERVOS; i++) {
-      servos[i].initServo(
-          servoPins[i],
-          stepDelay[i],
-          servoInitPosition[i]);
-    }
-  #endif
+#ifdef USE_SERVOS
+  int i;
+  for (i = 0; i < N_SERVOS; i++) {
+    servos[i].initServo(
+        servoPins[i],
+        stepDelay[i],
+        servoInitPosition[i]);
+  }
+#endif
 
-// Start the IMU
+/* Start the IMU */
 #ifdef USE_IMU
-if (!imu.begin()) {
-  Serial.println("IMU init failed");
-}
+  if (!imu.begin()) {
+    Serial.println("IMU init failed!");
+  } else {
+    Serial.println("IMU initialized successfully!");
+  }
 #endif
 
 }
